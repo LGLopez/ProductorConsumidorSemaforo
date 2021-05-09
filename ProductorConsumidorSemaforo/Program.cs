@@ -17,58 +17,81 @@ namespace ProductorConsumidorSemaforo
 
             void produce()
             {
-                producer.WaitOne();
                 int count = 0;
                 for (int i = 0; count < 20; i++, count++)
                 {
+                    producer.WaitOne();
                     if (i >= 20)
                     {
                         i = 0;
-                        buffer[0] = 0;
-                        Thread.Sleep(1000);
                     }
-                        
-                    buffer[i] = rand.Next(1, 99);
+                    if (buffer[i] == 0) 
+                    {
+                        int num = rand.Next(1, 99);
+                        buffer[i] = num;
+                        Console.WriteLine("El productor agrego el {0} al buffer en la posicion {1}", num, i);
+                    }
                 }
-                isDone = false;
+                producer.WaitOne();
+                isDone = true;
             }
             
             void consume()
             {
-                consumer.WaitOne();
-                while (isDone)
+                while (!isDone)
                 {
+                    consumer.WaitOne();
                     if (consumerCounter >= 20)
                     {
-
+                        consumerCounter = 0;
                     }
+
+                    if (buffer[consumerCounter] != 0)
+                    {
+                        int numTaken = buffer[consumerCounter];
+                        buffer[consumerCounter] = 0;
+                        Console.WriteLine("El consumidor saco el valor {0} de la posicion {1}", numTaken, consumerCounter);
+                    }
+                    
+                    consumerCounter++;
+                    if (consumerCounter >= 20)
+                    {
+                        consumerCounter = 0;
+                    }
+
                 }
             }
 
             void availabilty()
-            {/*
-                while (!isDone)
-                {*/
-                    if (i == 0 && buffer[0] == 0)
+            {
+                do
+                {
+                    Thread.Sleep(100);
+                    if (buffer[i] == 0)
                     {
                         producer.Release();
                     }
-                    if (buffer[consumerCounter] == 0)
+                    if (buffer[consumerCounter] != 0)
                     {
-
+                        consumer.Release();
                     }
-                /*}*/
-                
+                } while (!isDone);
+
+
             }
 
-            availabilty();
-            produce();
+            Thread producerThread = new Thread(produce);
+            Thread consumerThread = new Thread(consume);
+            Thread availabilityThread = new Thread(availabilty);
 
-            for (int j = 0; j < 20; j++)
-            {
-                Console.WriteLine("Buffer {0}: ", j);
-                Console.WriteLine(buffer[j]);
-            }
+            producerThread.Start();
+            consumerThread.Start();
+
+            availabilityThread.Start();
+
+            producerThread.Join();
+            consumerThread.Join();
+            availabilityThread.Join();
         }
     }
 }
