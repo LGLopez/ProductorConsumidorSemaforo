@@ -7,29 +7,67 @@ namespace ProductorConsumidorSemaforo
     {
         static void Main(string[] args)
         {
-            Semaphore producer = new Semaphore(1, 1);
+            Semaphore producer = new Semaphore(0, 1);
             Semaphore consumer = new Semaphore(0, 1);
             int[] buffer = new int[20];
 
+            Random rand = new Random();
+            bool isDone = false;
+            int i = 0, consumerCounter = 0;
+
             void produce()
             {
-
-            }
-
-            void initializeBuffer()
-            {
-                for (int i = 0; i < 20; i++)
+                producer.WaitOne();
+                int count = 0;
+                for (int i = 0; count < 20; i++, count++)
                 {
-                    buffer[i] = 0;
+                    if (i >= 20)
+                    {
+                        i = 0;
+                        buffer[0] = 0;
+                        Thread.Sleep(1000);
+                    }
+                        
+                    buffer[i] = rand.Next(1, 99);
+                }
+                isDone = false;
+            }
+            
+            void consume()
+            {
+                consumer.WaitOne();
+                while (isDone)
+                {
+                    if (consumerCounter >= 20)
+                    {
+
+                    }
                 }
             }
 
-            initializeBuffer();
+            void availabilty()
+            {/*
+                while (!isDone)
+                {*/
+                    if (i == 0 && buffer[0] == 0)
+                    {
+                        producer.Release();
+                    }
+                    if (buffer[consumerCounter] == 0)
+                    {
 
-            for (int i = 0; i < 20; i++)
+                    }
+                /*}*/
+                
+            }
+
+            availabilty();
+            produce();
+
+            for (int j = 0; j < 20; j++)
             {
-                Console.WriteLine("Buffer {0}: ", i);
-                Console.WriteLine(buffer[i]);
+                Console.WriteLine("Buffer {0}: ", j);
+                Console.WriteLine(buffer[j]);
             }
         }
     }
