@@ -14,7 +14,7 @@ namespace ProductorConsumidorSemaforo
             Random rand = new Random();
             bool isDone = false;
             int i = 0, consumerCounter = 0;
-            bool isProducerIn = true;
+            bool isProducerIn = true, finish = false ;
 
             void produce()
             {
@@ -82,22 +82,39 @@ namespace ProductorConsumidorSemaforo
                         consumer.Release();
 
                 } while (!isDone);
-
-
             }
+            
+            void stop()
+            {
+                ConsoleKeyInfo cki;
+                do
+                {
+                    cki = Console.ReadKey();
+                } while (cki.Key != ConsoleKey.Escape);
+                finish = true;
+                Environment.Exit(0);
+            }
+
+            Console.WriteLine("Presione ESC para terminar el programa en cualquier momento\n");
 
             Thread producerThread = new Thread(produce);
             Thread consumerThread = new Thread(consume);
             Thread availabilityThread = new Thread(availabilty);
+            Thread stopCode = new Thread(stop);
 
             producerThread.Start();
             consumerThread.Start();
-
             availabilityThread.Start();
+
+            stopCode.Start();
 
             producerThread.Join();
             consumerThread.Join();
             availabilityThread.Join();
+
+            Console.WriteLine("Presione ESC para salir");
+
+            stopCode.Join();
         }
     }
 }
