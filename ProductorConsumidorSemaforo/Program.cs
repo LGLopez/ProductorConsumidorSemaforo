@@ -22,9 +22,8 @@ namespace ProductorConsumidorSemaforo
                 {
                     producer.WaitOne();
                     if (i >= 20)
-                    {
                         i = 0;
-                    }
+                    
                     if (buffer[i] == 0) 
                     {
                         int num = rand.Next(1, 99);
@@ -42,9 +41,7 @@ namespace ProductorConsumidorSemaforo
                 {
                     consumer.WaitOne();
                     if (consumerCounter >= 20)
-                    {
                         consumerCounter = 0;
-                    }
 
                     if (buffer[consumerCounter] != 0)
                     {
@@ -55,9 +52,7 @@ namespace ProductorConsumidorSemaforo
                     
                     consumerCounter++;
                     if (consumerCounter >= 20)
-                    {
                         consumerCounter = 0;
-                    }
 
                 }
             }
@@ -68,13 +63,10 @@ namespace ProductorConsumidorSemaforo
                 {
                     Thread.Sleep(100);
                     if (buffer[i] == 0)
-                    {
                         producer.Release();
-                    }
                     if (buffer[consumerCounter] != 0)
-                    {
                         consumer.Release();
-                    }
+
                 } while (!isDone);
 
 
