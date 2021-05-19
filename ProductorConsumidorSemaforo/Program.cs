@@ -34,6 +34,7 @@ namespace ProductorConsumidorSemaforo
                             buffer[i] = num;
                             Console.WriteLine("El productor agrego el {0} al buffer en la posicion {1}", num, i);
                         }
+                        drawBuffer();
                         i++;
                         count++;
                         isProducerIn = false;
@@ -60,7 +61,7 @@ namespace ProductorConsumidorSemaforo
                             buffer[consumerCounter] = 0;
                             Console.WriteLine("El consumidor saco el valor {0} de la posicion {1}", numTaken, consumerCounter);
                         }
-
+                        drawBuffer();
                         consumerCounter++;
                         if (consumerCounter >= 20)
                             consumerCounter = 0;
@@ -74,10 +75,10 @@ namespace ProductorConsumidorSemaforo
             {
                 do
                 {
-                    Thread.Sleep(rand.Next(1, 9) * 100);
+                    Thread.Sleep(rand.Next(1, 9) * 200);
                     if (buffer[i] == 0)
                         producer.Release();
-                    Thread.Sleep(rand.Next(1, 9) * 100);
+                    Thread.Sleep(rand.Next(1, 9) * 200);
                     if (buffer[consumerCounter] != 0)
                         consumer.Release();
 
@@ -93,6 +94,23 @@ namespace ProductorConsumidorSemaforo
                 } while (cki.Key != ConsoleKey.Escape);
                 finish = true;
                 Environment.Exit(0);
+            }
+
+            void drawBuffer()
+            {
+                string results = "";
+                for (int i = 0; i < 20; i++)
+                {
+                    if (buffer[i] == 0)
+                    {
+                        results += "_|";
+                    }
+                    else
+                    {
+                        results += buffer[i] + "|";
+                    }
+                }
+                Console.WriteLine(results);
             }
 
             Console.WriteLine("Presione ESC para terminar el programa en cualquier momento\n");
